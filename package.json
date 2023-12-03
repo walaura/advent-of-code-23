@@ -1,6 +1,8 @@
 {
-  "type": "module",
   "engines": {
     "node": ">=21.3.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1"
   }
 }
