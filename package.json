@@ -3,6 +3,7 @@
     "node": ">=21.3.0"
   },
   "devDependencies": {
+    "nodemon": "^3.0.2",
     "ts-node": "^10.9.1"
   }
 }
