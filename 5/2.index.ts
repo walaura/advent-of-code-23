@@ -35,11 +35,14 @@ const getMapFromString = (string: string): AlmanacMap => {
     rangeAccess[sourceStart + length] = 0;
   }
 
+  const entries = Object.entries(rangeAccess);
+  const rangeKeys = entries.map(([k]) => Number(k));
+  const rangeValues = entries.map(([_, v]) => v);
   return {
     from,
     to,
-    rangeKeys: Object.keys(rangeAccess).map((n) => Number(n)),
-    rangeValues: Object.values(rangeAccess),
+    rangeKeys,
+    rangeValues,
   };
 };
 
@@ -47,6 +50,9 @@ const applyMap = (value, map: AlmanacMap) => {
   let closest = map.rangeKeys.findIndex((idx) => idx > value) - 1;
   if (closest === -2) {
     closest = map.rangeKeys.length - 1;
+  }
+  if (closest === -1) {
+    closest = 0;
   }
   return value + map.rangeValues[closest];
 };
@@ -58,13 +64,16 @@ const maps = parts.map((part) => getMapFromString(part));
 let smaller = Infinity;
 for (let seedIndex = 0; seedIndex + 1 < seeds.length; seedIndex += 2) {
   const [seed, range] = [seeds[seedIndex], seeds[seedIndex + 1]];
-  console.log(`seed: ${seed}`);
+  console.log(`seed: ${seed}-${seed + range}`);
+  console.log(`${seedIndex / 2 + 1}/${seeds.length / 2}`);
   for (let rangeIndex = 0; rangeIndex < range; rangeIndex++) {
     let value = seed + rangeIndex;
     for (let map of maps) {
       value = applyMap(value, map);
     }
+
     if (value < smaller) {
+      console.log(`new smaller value! ${value}`);
       smaller = value;
     }
   }
