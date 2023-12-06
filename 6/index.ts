@@ -18,6 +18,13 @@ for (let i = 0; i < data[0].length; i++) {
   });
 }
 
+races = [
+  races.reduce((acc, race) => ({
+    time: Number(`${acc?.time ?? ""}${race.time}`),
+    distance: Number(`${acc?.distance ?? ""}${race.distance}`),
+  })),
+];
+
 type Race = { time: number; distance: number };
 
 function getSpeeds({ time, distance }: Race) {
@@ -34,6 +41,8 @@ function getSpeeds({ time, distance }: Race) {
       break;
     }
   }
+
+  console.log({ time, winUpTo, winFrom });
 
   return winUpTo - winFrom + 1;
 }
