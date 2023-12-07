@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "lib": ["ES2021", "ES2021.String"]
+    "lib": ["ES2021", "ES2021.String"],
+    "esModuleInterop": true
   },
   "exclude": ["node_modules", "**/node_modules/*"]
 }
