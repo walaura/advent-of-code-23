@@ -14,7 +14,7 @@ const data: Hand[] = fs
   });
 
 const SCORES = Object.fromEntries(
-  "AKQJT98765432".split("").map((s, k) => [s, k + 1])
+  "AKQT98765432J".split("").map((s, k) => [s, k + 1])
 );
 const TYPES = {
   five: 1,
@@ -42,6 +42,23 @@ const calculateType = (hand: Hand) => {
     samesies[hand.cards[i]]++;
   }
 
+  /*
+  When its a joker its always gonna become the card 
+  that is already repeated the most (nice)
+  */
+  if (samesies["J"]) {
+    const jokers = samesies["J"];
+    delete samesies["J"];
+    //this is bs but so is the test data
+    if (hand.cards === "JJJJJ") {
+      samesies["A"] = 1;
+    }
+    const entries = Object.entries(samesies).sort((a, b) => b[1] - a[1]);
+    for (let i = 0; i < jokers; i++) {
+      samesies[entries[0][0]]++;
+    }
+  }
+
   const keys = Object.keys(samesies);
   const values = Object.values<number>(samesies);
 
@@ -53,14 +70,14 @@ const calculateType = (hand: Hand) => {
   if (keys.length === 4) {
     return "one-pair";
   }
-  //AABBC - AAABC
+  //AABBC, AAABC
   if (keys.length === 3) {
     if (Math.max(...values) === 3) {
       return "three";
     }
     return "two-pair";
   }
-  //AAABB - AAAAB
+  //AAABB, AAAAB
   if (keys.length === 2) {
     if (Math.max(...values) === 4) {
       return "four";
@@ -100,6 +117,6 @@ const results = byType
   .flat()
   .reverse();
 
-const scores = results.map((r, index) => r.stake*(index+1));
-
-console.log(scores.reduce((a,b)=>a+b,0));
+const scores = results.map((r, index) => r.stake * (index + 1));
+console.log(results);
+console.log(scores.reduce((a, b) => a + b, 0));

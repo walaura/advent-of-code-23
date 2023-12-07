@@ -53,14 +53,14 @@ const calculateType = (hand: Hand) => {
   if (keys.length === 4) {
     return "one-pair";
   }
-  //AABBC - AAABC
+  //AABBC, AAABC
   if (keys.length === 3) {
     if (Math.max(...values) === 3) {
       return "three";
     }
     return "two-pair";
   }
-  //AAABB - AAAAB
+  //AAABB, AAAAB
   if (keys.length === 2) {
     if (Math.max(...values) === 4) {
       return "four";
@@ -101,5 +101,4 @@ const results = byType
   .reverse();
 
 const scores = results.map((r, index) => r.stake*(index+1));
-
 console.log(scores.reduce((a,b)=>a+b,0));
