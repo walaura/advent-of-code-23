@@ -1,13 +1,14 @@
-const values = [...Array(100).keys()].map((v) => `Value ${v}`);
-
-
-function find(process, isValidValue, start, end) {
+function find<T>(
+  process: (half: number) => T,
+  isValidValue: (T) => boolean,
+  start: number,
+  end: number
+) {
   const half = Math.round((end - start) / 2 + start);
   const value = process(half);
   if (isValidValue(value)) {
     return value;
   }
-  console.log(end, start, half, values[half]);
   if (end - half < 1) {
     return null;
   }
@@ -16,6 +17,8 @@ function find(process, isValidValue, start, end) {
     find(process, isValidValue, half, end)
   );
 }
+
+const values = [...Array(100).keys()].map((v) => `Value ${v}`);
 
 function process(half) {
   return values[half];
