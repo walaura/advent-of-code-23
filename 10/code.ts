@@ -146,7 +146,7 @@ function walk(y, x) {
     }
   }
 
-  return count ;
+  return count;
 }
 
 const total = walk(startRow, startCol);
