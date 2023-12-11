@@ -131,7 +131,4 @@ for (let [start, end] of routes) {
   tot += path;
 }
 
-console.log(tot);
-
-const pathLol = getPath(starMap[37], starMap[145]);
-preview(pathLol);
+console.log(starMap);
