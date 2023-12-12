@@ -71,10 +71,11 @@ const solveLine = (mask: string, _row: number[]): LineWithMeta[] => {
     .split("")
     .map((v, i) => {
       if (v === Characters.Spring) {
-        return i;
+        return i + 1;
       }
     })
-    .filter(Boolean);
+    .filter(Boolean)
+    .map((v) => v - 1);
 
   let possibles: Line[][] = [
     solveValvePosition(mask, 0, end, first).map((r) => [r]),
@@ -98,14 +99,13 @@ const solveLine = (mask: string, _row: number[]): LineWithMeta[] => {
 
   let final = possibles.pop();
   possibles = null;
-
   // this sux but lets filter so all the # are assigned
   final = final.filter((line) => {
     for (let valveIndex of valves) {
       if (
         !line.find(
           ({ position, size, offset }) =>
-            position <= valveIndex && size+position >= valveIndex
+            position <= valveIndex && size + position >= valveIndex
         )
       ) {
         return false;
@@ -138,10 +138,7 @@ const preview = (line: LineWithMeta) => {
 let tot = 0;
 rows.map(([mask, input]) => {
   const lines = solveLine(mask, input);
-  if(lines.length > 70) {
-    console.log(mask)
-  }
-  lines.map(preview);
+  //lines.map(preview);
   tot += lines.length;
 });
 
