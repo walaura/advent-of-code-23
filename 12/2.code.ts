@@ -21,9 +21,10 @@ const inflate = (r) =>
     Array(5).fill(mask).join("?"),
     Array(5).fill(input).flat(),
   ]);
-rows = inflate(rows);
+//rows = inflate(rows);
 
 type Row = [string, number[]];
+type ValveArrangement = string;
 
 enum Characters {
   Empty = ".",
@@ -31,19 +32,16 @@ enum Characters {
   Unknown = "?",
 }
 
-type ValvePosition = string;
-
-type Line = ValvePosition[];
 
 const sumArray = (arr) => arr.reduce((a, b) => a + b, 0);
 const sumGaps = (arr) => sumArray(arr) + 1 * (arr.length - 1) + 1;
 
-const solveValvePosition = (
+const getValveArrangements = (
   mask: string,
   start: number,
   end: number,
   size: number
-): Line => {
+): ValveArrangement[] => {
   let possibles = [];
   top: for (let i = 0; i <= end - size; i++) {
     // where the next empty is
@@ -75,52 +73,69 @@ const solveValvePosition = (
   return possibles;
 };
 
+const fitsInMask = (
+  start: number,
+  mask: string,
+  valve: string,
+  isLast: boolean
+) => {
+  const submask = mask.substring(start, start + valve.length);
+
+  // check if we are covering all # in this region
+  for (let char = 0; char < submask.length; char++) {
+    if (submask[char] === "#" && valve[char] !== Characters.Spring) {
+      return;
+    }
+  }
+
+  // check if theres any unused # that we need
+  if (isLast) {
+    const remainder = mask.substring(start + valve.length);
+    if (remainder && remainder.includes(Characters.Spring)) {
+      return;
+    }
+  }
+
+  return true;
+};
+
 const solveLine = (mask: string, row: number[]): number => {
   const lineSize = mask.length;
-  let nextPossiblesCount = new Map();
-  let currentPossiblesCount = new Map([[0, 1]]);
+  let nextPossibleStarts = new Map();
+  let currentPossibleStarts = new Map([[0, 1]]);
 
-  for (let curValveIndex = 0; curValveIndex < row.length; curValveIndex++) {
-    nextPossiblesCount = new Map();
+  for (let valveIndex = 0; valveIndex < row.length; valveIndex++) {
+    nextPossibleStarts = new Map();
 
-    for (let valvesBefore of currentPossiblesCount.keys()) {
-      const basis = currentPossiblesCount.get(valvesBefore);
+    for (let startAt of currentPossibleStarts.keys()) {
+      const basis = currentPossibleStarts.get(startAt);
 
-      solveValvePosition(
+      getValveArrangements(
         mask,
-        valvesBefore,
-        lineSize - sumGaps(row.slice(curValveIndex + 1)) - valvesBefore,
-        row[curValveIndex]
+        startAt,
+        lineSize - sumGaps(row.slice(valveIndex + 1)) - startAt,
+        row[valveIndex]
       ).forEach((valve) => {
-        const submask = mask.substring(
-          valvesBefore,
-          valvesBefore + valve.length
-        );
-
-        for (let char = 0; char < submask.length; char++) {
-          if (submask[char] === "#" && valve[char] !== "#") {
-            return;
-          }
+        if (
+          !fitsInMask(
+            startAt,
+            mask,
+            valve,
+            valveIndex === row.length - 1
+          )
+        ) {
+          return;
         }
 
-        if (curValveIndex === row.length - 1) {
-          const remainder = mask.substring(valvesBefore + valve.length);
-          if (remainder && remainder.includes("#")) {
-            return;
-          }
-        }
-        const val = nextPossiblesCount.get(valvesBefore + valve.length);
-        if (!val) {
-          nextPossiblesCount.set(valvesBefore + valve.length, 0);
-        }
-        nextPossiblesCount.set(valvesBefore + valve.length, (val ?? 0) + basis);
+        const val = nextPossibleStarts.get(startAt + valve.length);
+        nextPossibleStarts.set(startAt + valve.length, (val ?? 0) + basis);
       });
     }
 
-    currentPossiblesCount = nextPossiblesCount;
+    currentPossibleStarts = nextPossibleStarts;
   }
 
-  return [...nextPossiblesCount.values()].reduce((a, b) => a + b, 0);
+  return [...nextPossibleStarts.values()].reduce((a, b) => a + b, 0);
 };
 
 let tot = 0;
